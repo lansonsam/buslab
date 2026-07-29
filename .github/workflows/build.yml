@@ -22,8 +22,7 @@ jobs:
           apt-get install -y --no-install-recommends \
             curl ca-certificates git file binutils pkg-config gcc g++ make \
             libgl1-mesa-dev libglu1-mesa-dev xorg-dev \
-            libxkbcommon-dev libfontconfig1-dev libfreetype6-dev \
-            libwayland-dev wayland-protocols libwayland-egl-backend-dev
+            libxkbcommon-dev libfontconfig1-dev libfreetype6-dev
 
       - name: 安装 Go ${{ env.GO_VERSION }}
         run: |
@@ -39,12 +38,14 @@ jobs:
       - name: 单元测试（不依赖内核资源）
         run: go test ./internal/...
 
-      - name: 编译
+      # 只编 X11 后端：Fyne 默认同时编译 Wayland，而 Debian 11 的 libwayland 1.18
+      # 缺少 WL_MARSHAL_FLAG_DESTROY（需 ≥1.20）。麒麟等目标桌面走 X11 即可。
+      - name: 编译（X11）
         env:
           CGO_ENABLED: "1"
         run: |
           mkdir -p dist
-          go build -trimpath -buildvcs=false -ldflags "-s -w" -o dist/buslab ./cmd/buslab
+          go build -tags x11 -trimpath -buildvcs=false -ldflags "-s -w" -o dist/buslab ./cmd/buslab
           file dist/buslab
           echo "最高 GLIBC 依赖："
           objdump -T dist/buslab | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -n 3
