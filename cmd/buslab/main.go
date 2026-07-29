@@ -27,6 +27,16 @@ func main() {
 	orchestrator := orch.New(bootstrap.Registry(h, &report), report)
 	settings := persist.LoadSettings()
 
+	// 界面更新全部经 internal/ui 的事件泵用 fyne.Do 回主线程，声明后可关掉
+	// Fyne 2.8 的线程兼容垫层与启动警告。
+	app.SetMetadata(fyne.AppMetadata{
+		ID:         "ai.factory.buslab",
+		Name:       "虚拟总线实验室",
+		Version:    "1.0.0",
+		Build:      1,
+		Migrations: map[string]bool{"fyneDo": true},
+	})
+
 	application := app.NewWithID("ai.factory.buslab")
 	if settings.DarkTheme {
 		application.Settings().SetTheme(theme.DarkTheme())
