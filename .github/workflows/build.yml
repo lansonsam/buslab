@@ -32,6 +32,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: 允许 go 读取容器内的仓库
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: 单元测试（不依赖内核资源）
         run: go test ./internal/...
 
@@ -40,7 +43,7 @@ jobs:
           CGO_ENABLED: "1"
         run: |
           mkdir -p dist
-          go build -trimpath -ldflags "-s -w" -o dist/buslab ./cmd/buslab
+          go build -trimpath -buildvcs=false -ldflags "-s -w" -o dist/buslab ./cmd/buslab
           file dist/buslab
           echo "最高 GLIBC 依赖："
           objdump -T dist/buslab | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -n 3
