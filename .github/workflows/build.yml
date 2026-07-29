@@ -22,7 +22,8 @@ jobs:
           apt-get install -y --no-install-recommends \
             curl ca-certificates git file binutils pkg-config gcc g++ make \
             libgl1-mesa-dev libglu1-mesa-dev xorg-dev \
-            libxkbcommon-dev libfontconfig1-dev libfreetype6-dev
+            libxkbcommon-dev libfontconfig1-dev libfreetype6-dev \
+            libwayland-dev wayland-protocols libwayland-egl-backend-dev libdecor-0-dev
 
       - name: 安装 Go ${{ env.GO_VERSION }}
         run: |
